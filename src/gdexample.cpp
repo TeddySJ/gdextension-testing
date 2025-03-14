@@ -29,6 +29,7 @@ void BoidComponent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_separation_weight"), &BoidComponent::get_separation_weight);
 	ClassDB::bind_method(D_METHOD("process_boid_behavior"), &BoidComponent::process_boid_behavior);
 	ClassDB::bind_method(D_METHOD("get_calculated_velocity"), &BoidComponent::get_calculated_velocity);
+	ClassDB::bind_method(D_METHOD("move_to_position"), &BoidComponent::move_to_position);
 	
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "boid_layer"), "set_boid_layer", "get_boid_layer");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "desired_distance"), "set_desired_distance", "get_desired_distance");
@@ -44,19 +45,6 @@ BoidComponent::BoidComponent() {
 
 BoidComponent::~BoidComponent() {
 	// Add your cleanup here.
-}
-
-void BoidComponent::_process(double delta) {
-	time_passed += delta;
-
-	Vector2 new_position = Vector2(
-		amplitude + (amplitude * sin(time_passed * 2.0)),
-		amplitude + (amplitude * cos(time_passed * 1.5))
-	);
-
-	new_position += time_passed * velocity;
-
-	set_position(new_position);
 }
 
 void BoidComponent::set_amplitude(const double p_amplitude) {
@@ -153,4 +141,9 @@ void BoidComponent::set_boid_layer(int layer) {
     
     Vector2 BoidComponent::get_calculated_velocity() const {
         return velocity;
+    }
+
+    void godot::BoidComponent::move_to_position(const Vector2 p_position)
+    {
+		set_position(p_position);
     }

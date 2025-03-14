@@ -60,11 +60,12 @@ public:
 
 	Vector2 get_calculated_velocity() const;
 
+	void move_to_position(const Vector2 p_position);
+
 public:
 	BoidComponent();
 	~BoidComponent();
 
-	void _process(double delta) override;
 };
 
 }

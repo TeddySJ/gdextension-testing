@@ -1,16 +1,12 @@
 [gd_scene load_steps=3 format=3 uid="uid://bei1eqi143d65"]
 
-[ext_resource type="Script" uid="uid://deq3fk0wd6k5d" path="res://boid_test.gd" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://c4vuu6d2mxtny" path="res://test.gd" id="1_0xm2m"]
 [ext_resource type="Texture2D" uid="uid://nalr150rkucw" path="res://icon.svg" id="1_ig7tw"]
 
 [node name="Main" type="Node"]
 
-[node name="Boiiids" type="Node2D" parent="."]
-
-[node name="BoidTest" type="CharacterBody2D" parent="Boiiids"]
-script = ExtResource("1_0xm2m")
-
 [node name="Node2D" type="Node2D" parent="."]
+script = ExtResource("1_0xm2m")
 
 [node name="BoidComponent" type="BoidComponent" parent="Node2D"]
 velocity = Vector2(100, 0)
