@@ -3,27 +3,24 @@
 
 #include <godot_cpp/classes/sprite2d.hpp>
 
-namespace godot {
+using namespace godot;
 
-// Define Boid Layers (matching your GDScript enum)
-enum BoidLayer {
-    GROUND = 0,
-    FLYING = 1,
-    BOTH = 2,
-    NONE = 3
-};
+class BoidComponent : public Node2D {
+	GDCLASS(BoidComponent, Node2D)
 
-class BoidComponent : public Sprite2D {
-	GDCLASS(BoidComponent, Sprite2D)
+public:
+	enum BOID_LAYER_SETTING {
+		GROUND = 0,
+		FLYING = 1,
+		BOTH = 2,
+		NONE = 3
+		};
 
 protected:
     static void _bind_methods();
 
 private:
-	double time_passed;
-	double amplitude;
-
-	BoidLayer boid_layer = GROUND;
+	BOID_LAYER_SETTING boid_layer = GROUND;
     double desired_distance = 50.0;
     double desired_distance_squared = 2500.0;
     double separation_weight = 1.0;
@@ -38,12 +35,6 @@ private:
     double cache_refresh_time = 0.1; // Refresh nearby enemies every 0.1 seconds
 
 public:
-	void set_amplitude(const double p_amplitude);
-	double get_amplitude() const;
-
-	void set_velocity(const Vector2 p_velocity);
-	Vector2 get_velocity() const;
-
 	void set_boid_layer(int layer);
     
     int get_boid_layer() const;
@@ -66,8 +57,9 @@ public:
 	BoidComponent();
 	~BoidComponent();
 
+	void _ready() override;
 };
 
-}
+VARIANT_ENUM_CAST(BoidComponent::BOID_LAYER_SETTING);
 
 #endif

@@ -11,16 +11,6 @@
 using namespace godot;
 
 void BoidComponent::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("get_amplitude"), &BoidComponent::get_amplitude);
-	ClassDB::bind_method(D_METHOD("set_amplitude", "p_amplitude"), &BoidComponent::set_amplitude);
-
-	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "amplitude"), "set_amplitude", "get_amplitude");
-
-	ClassDB::bind_method(D_METHOD("get_velocity"), &BoidComponent::get_velocity);
-	ClassDB::bind_method(D_METHOD("set_velocity", "p_velocity"), &BoidComponent::set_velocity);
-
-	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "velocity"), "set_velocity", "get_velocity");
-
 	ClassDB::bind_method(D_METHOD("set_boid_layer", "layer"), &BoidComponent::set_boid_layer);
 	ClassDB::bind_method(D_METHOD("get_boid_layer"), &BoidComponent::get_boid_layer);
 	ClassDB::bind_method(D_METHOD("set_desired_distance", "distance"), &BoidComponent::set_desired_distance);
@@ -31,40 +21,33 @@ void BoidComponent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_calculated_velocity"), &BoidComponent::get_calculated_velocity);
 	ClassDB::bind_method(D_METHOD("move_to_position"), &BoidComponent::move_to_position);
 	
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "boid_layer"), "set_boid_layer", "get_boid_layer");
+	BIND_ENUM_CONSTANT(GROUND)
+	BIND_ENUM_CONSTANT(FLYING)
+	BIND_ENUM_CONSTANT(BOTH)
+	BIND_ENUM_CONSTANT(NONE)
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "boid_layer", PROPERTY_HINT_ENUM, "Ground,Flying,Both,None"), "set_boid_layer", "get_boid_layer");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "desired_distance"), "set_desired_distance", "get_desired_distance");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "separation_weight"), "set_separation_weight", "get_separation_weight");
 }
 
 BoidComponent::BoidComponent() {
 	// Initialize any variables here.
-	time_passed = 0.0;
-	amplitude = 10.0;
-	velocity = Vector2(0, 0);
 }
 
 BoidComponent::~BoidComponent() {
 	// Add your cleanup here.
 }
 
-void BoidComponent::set_amplitude(const double p_amplitude) {
-	amplitude = p_amplitude;
-}
-
-double BoidComponent::get_amplitude() const {
-	return amplitude;
-}
-
-void BoidComponent::set_velocity(const Vector2 p_velocity) {
-	velocity = p_velocity;
-}
-
-Vector2 BoidComponent::get_velocity() const {
-	return velocity;
-}
+void BoidComponent::_ready() {
+        parent = Object::cast_to<Node2D>(get_parent());
+        if (!parent) {
+            UtilityFunctions::printerr("BoidComponent must be a child of a Node2D");
+        }
+    }
 
 void BoidComponent::set_boid_layer(int layer) {
-        boid_layer = static_cast<BoidLayer>(layer);
+        boid_layer = static_cast<BOID_LAYER_SETTING>(layer);
     }
     
     int BoidComponent::get_boid_layer() const {
@@ -143,7 +126,7 @@ void BoidComponent::set_boid_layer(int layer) {
         return velocity;
     }
 
-    void godot::BoidComponent::move_to_position(const Vector2 p_position)
+    void BoidComponent::move_to_position(const Vector2 p_position)
     {
 		set_position(p_position);
     }
