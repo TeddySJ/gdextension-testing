@@ -5,5 +5,7 @@
 [node name="Main" type="Node"]
 
 [node name="GDExample" type="GDExample" parent="."]
+amplitude = 40.0
+velocity = Vector2(100, 1)
 texture = ExtResource("1_ig7tw")
 centered = false
