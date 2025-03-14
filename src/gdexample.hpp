@@ -54,6 +54,8 @@ public:
 
 	Vector2 get_calculated_velocity() const;
 
+    void set_calculated_velocity(const Vector2 p_velocity);
+
 	void move_to_position(const Vector2 p_position);
 
 public:

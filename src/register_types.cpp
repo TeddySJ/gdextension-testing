@@ -1,6 +1,7 @@
 #include "register_types.hpp"
 
 #include "gdexample.hpp"
+#include "boidmanager.hpp"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -14,6 +15,7 @@ void initialize_example_module(ModuleInitializationLevel p_level) {
 	}
 
 	GDREGISTER_RUNTIME_CLASS(BoidComponent);
+	GDREGISTER_RUNTIME_CLASS(BoidManager);
 }
 
 void uninitialize_example_module(ModuleInitializationLevel p_level) {

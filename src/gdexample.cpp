@@ -128,6 +128,11 @@ void BoidComponent::set_boid_layer(int layer) {
         return velocity;
     }
 
+    void BoidComponent::set_calculated_velocity(const Vector2 p_velocity)
+    {
+		velocity = p_velocity;
+    }
+
     void BoidComponent::move_to_position(const Vector2 p_position)
     {
 		set_position(p_position);
