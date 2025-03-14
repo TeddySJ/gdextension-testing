@@ -19,7 +19,8 @@ void BoidComponent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_separation_weight"), &BoidComponent::get_separation_weight);
 	ClassDB::bind_method(D_METHOD("process_boid_behavior"), &BoidComponent::process_boid_behavior);
 	ClassDB::bind_method(D_METHOD("get_calculated_velocity"), &BoidComponent::get_calculated_velocity);
-	ClassDB::bind_method(D_METHOD("move_to_position"), &BoidComponent::move_to_position);
+	ClassDB::bind_method(D_METHOD("move_to_position", "position"), &BoidComponent::move_to_position);
+	ClassDB::bind_method(D_METHOD("set_game_world", "game_world"), &BoidComponent::set_game_world);
 	
 	BIND_ENUM_CONSTANT(GROUND)
 	BIND_ENUM_CONSTANT(FLYING)
@@ -71,6 +72,10 @@ void BoidComponent::set_boid_layer(int layer) {
         return separation_weight;
     }
 
+	void BoidComponent::set_game_world(Node2D* node) {
+        game_world = node;
+    }
+
 	// The main boid processing function (equivalent to _boid_process in GDScript)
     void BoidComponent::process_boid_behavior() {
         if (boid_layer == NONE || !parent) {
@@ -83,29 +88,27 @@ void BoidComponent::set_boid_layer(int layer) {
         // Get nearby enemies from game world
         TypedArray<Node2D> all_enemies;
         
+		all_enemies = game_world->call("_get_enemies_in_area_and_of_layer", 
+				current_position, desired_distance, static_cast<int>(boid_layer));
         // Check if we need to refresh the cache
+		/*
         cache_timer += get_process_delta_time();
         if (cache_timer >= cache_refresh_time || cached_nearby_enemies.size() == 0) {
             // Call to your game world to get enemies
-            // Note: You'll need to expose this method from your GameWorld to GDScript 
-            // or adapt this part to use your existing spatial partitioning
-            Object* game_world = Engine::get_singleton()->get_singleton("Globals")->call("get", "game_world");
-            if (game_world) { 
-                all_enemies = game_world->call("_get_enemies_in_area_and_of_layer", 
-                    current_position, desired_distance, static_cast<int>(boid_layer));
-                cached_nearby_enemies = all_enemies;
-                cache_timer = 0.0;
-            }
+			all_enemies = game_world->call("_get_enemies_in_area_and_of_layer", 
+				current_position, desired_distance, static_cast<int>(boid_layer));
+			cached_nearby_enemies = all_enemies;
+			cache_timer = 0.0;
         } else {
             all_enemies = cached_nearby_enemies;
         }
-        
+        */
         Vector2 separation_force(0, 0);
         
         // Calculate separation forces
         for (int i = 0; i < all_enemies.size(); i++) {
             Node2D* enemy = Object::cast_to<Node2D>(all_enemies[i]);
-            if (!enemy || enemy == parent) {
+            if (enemy == parent) {
                 continue;
             }
             
@@ -113,13 +116,12 @@ void BoidComponent::set_boid_layer(int layer) {
             double distance_squared = offset.length_squared();
             
             if (distance_squared < desired_distance_squared && distance_squared > 0) {
-                double distance = Math::sqrt(distance_squared);
-                separation_force += offset.normalized() * ((desired_distance - distance) / desired_distance);
+                separation_force += offset.normalized() * ((desired_distance - Math::sqrt(distance_squared)) / desired_distance);
             }
         }
         
         // Apply separation force to velocity
-        velocity += separation_force * separation_weight;
+        velocity = separation_force * separation_weight;
     }
     
     Vector2 BoidComponent::get_calculated_velocity() const {

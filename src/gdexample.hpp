@@ -25,7 +25,8 @@ private:
     double desired_distance_squared = 2500.0;
     double separation_weight = 1.0;
     Vector2 velocity = Vector2(0, 0);
-    
+    Node2D* game_world = nullptr;
+
     // Reference to the parent enemy node
     Node2D* parent = nullptr;
     
@@ -46,6 +47,8 @@ public:
     void set_separation_weight(double weight);
     
     double get_separation_weight() const;
+
+    void set_game_world(Node2D* world);
 
 	void process_boid_behavior();
 
