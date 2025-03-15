@@ -52,6 +52,8 @@ public:
 
 	void process_boid_behavior();
 
+    void process_boid_behavior_experimental();
+
 	Vector2 get_calculated_velocity() const;
 
     void set_calculated_velocity(const Vector2 p_velocity);

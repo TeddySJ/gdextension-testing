@@ -18,6 +18,7 @@ void BoidComponent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_separation_weight", "weight"), &BoidComponent::set_separation_weight);
 	ClassDB::bind_method(D_METHOD("get_separation_weight"), &BoidComponent::get_separation_weight);
 	ClassDB::bind_method(D_METHOD("process_boid_behavior"), &BoidComponent::process_boid_behavior);
+	ClassDB::bind_method(D_METHOD("process_boid_behavior_experimental"), &BoidComponent::process_boid_behavior_experimental);
 	ClassDB::bind_method(D_METHOD("get_calculated_velocity"), &BoidComponent::get_calculated_velocity);
 	ClassDB::bind_method(D_METHOD("move_to_position", "position"), &BoidComponent::move_to_position);
 	ClassDB::bind_method(D_METHOD("set_game_world", "game_world"), &BoidComponent::set_game_world);
@@ -89,7 +90,11 @@ void BoidComponent::set_boid_layer(int layer) {
         TypedArray<Node2D> all_enemies;
         
 		all_enemies = game_world->call("_get_enemies_in_area_and_of_layer", 
-				current_position, desired_distance, static_cast<int>(boid_layer));
+            current_position, desired_distance, static_cast<int>(boid_layer));
+
+
+		//all_enemies = game_world->call("_get_surrounding_boids", 
+		//		current_position, desired_distance, this);
         // Check if we need to refresh the cache
 		/*
         cache_timer += get_process_delta_time();
@@ -103,6 +108,51 @@ void BoidComponent::set_boid_layer(int layer) {
             all_enemies = cached_nearby_enemies;
         }
         */
+        Vector2 separation_force(0, 0);
+        
+        // Calculate separation forces
+        for (int i = 0; i < all_enemies.size(); i++) {
+            Node2D* enemy = Object::cast_to<Node2D>(all_enemies[i]);
+            if (enemy == parent) {
+                continue;
+            }
+            
+            Vector2 offset = current_position - enemy->get_global_position();
+            double distance_squared = offset.length_squared();
+            
+            if (distance_squared < desired_distance_squared && distance_squared > 0) {
+                separation_force += offset.normalized() * ((desired_distance - Math::sqrt(distance_squared)) / desired_distance);
+            }
+        }
+        
+        // Apply separation force to velocity
+        velocity = separation_force * separation_weight;
+    }
+
+    void BoidComponent::process_boid_behavior_experimental() {
+        if (boid_layer == NONE || !parent) {
+            return;
+        }
+        
+        // Get position from parent
+        Vector2 current_position = parent->get_global_position();
+        
+        // Get nearby enemies from game world
+        TypedArray<Node2D> all_enemies;
+        
+        // Check if we need to refresh the cache
+        cache_timer += get_process_delta_time();
+
+        if (cache_timer >= cache_refresh_time || cached_nearby_enemies.size() == 0) {
+            // Call to your game world to get enemies
+            all_enemies = game_world->call("_get_enemies_in_area_and_of_layer", 
+                current_position, desired_distance, static_cast<int>(boid_layer));
+            cached_nearby_enemies = all_enemies;
+			cache_timer = 0.0;
+        } else {
+            all_enemies = cached_nearby_enemies;
+        }
+
         Vector2 separation_force(0, 0);
         
         // Calculate separation forces
